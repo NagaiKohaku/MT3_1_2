@@ -46,9 +46,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		memcpy(preKeys, keys, 256);
 		Novice::GetHitKeyStateAll(keys);
 
-		///
-		/// ↓更新処理ここから
-		///
+		ImGui::Begin("Window");
+		ImGui::DragFloat3("CameraTranslate", &cameraTranslate.x, 0.01f);
+		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.01f);
+		ImGui::DragFloat3("ShpereCenter", &sphere.center.x, 0.01f);
+		ImGui::DragFloat("SphereRadius", &sphere.radius, 0.01f);
+		ImGui::End();
 
 		Matrix4x4 cameraMatrix = Pipeline::MakeAffineMatrix({ 1.0f,1.0f,1.0f }, cameraRotate, cameraTranslate);
 
@@ -60,28 +63,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		Matrix4x4 viewPortMatrix = Pipeline::MakeViewportMatrix(0, 0, float(kWindowWidth), float(kWindowHeight), 0.0f, 1.0f);
 
-		ImGui::Begin("Window");
-		ImGui::DragFloat3("CameraTranslate", &cameraTranslate.x, 0.01f);
-		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.01f);
-		ImGui::DragFloat3("ShpereCenter", &sphere.center.x, 0.01f);
-		ImGui::DragFloat("SphereRadius", &sphere.radius, 0.01f);
-		ImGui::End();
-
 		DrawGrid(viewProjectionMatrix, viewPortMatrix);
 
 		DrawSphere(sphere, viewProjectionMatrix, viewPortMatrix, 0x000000FF);
-
-		///
-		/// ↑更新処理ここまで
-		///
-
-		///
-		/// ↓描画処理ここから
-		///
-
-		///
-		/// ↑描画処理ここまで
-		///
 
 		// フレームの終了
 		Novice::EndFrame();
@@ -198,12 +182,12 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 
 	Matrix4x4 worldViewProjectionMatrix = Pipeline::Multiply(worldMatrix, viewProjectionMatrix);
 
-	//緯度(θ)の方向に分割
+	//緯度(θ)の方向に分割　-π/2 ~ π/2
 	for (uint32_t latIndex = 0; latIndex < kSubDivision; ++latIndex) {
 
 		float lat = -PI / 2.0f + kLatEvery * latIndex;
 
-		//経度(φ)の方向に分割
+		//経度(φ)の方向に分割 0 ~ 2π
 		for (uint32_t lonIndex = 0; lonIndex < kSubDivision; ++lonIndex) {
 
 			float lon = lonIndex * kLonEvery;
